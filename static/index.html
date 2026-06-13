@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Briefing — Daily AI News Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css?v=2" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Sidebar -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">AI Briefing</span>
+        </div>
+        <p class="logo-sub">Personalized AI News</p>
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <!-- Role Selector -->
+        <div class="nav-section">
+          <h3 class="nav-label">Your Role</h3>
+          <div class="role-list" id="role-list">
+            <button class="role-btn active" data-role="Developer">
+              <span class="role-icon">👨‍💻</span>
+              <span>Developer</span>
+            </button>
+            <button class="role-btn" data-role="Founder">
+              <span class="role-icon">🚀</span>
+              <span>Founder</span>
+            </button>
+            <button class="role-btn" data-role="Content Creator">
+              <span class="role-icon">✍️</span>
+              <span>Content Creator</span>
+            </button>
+            <button class="role-btn" data-role="Non-Technical">
+              <span class="role-icon">🧑</span>
+              <span>Non-Technical</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Topic Filters -->
+        <div class="nav-section">
+          <h3 class="nav-label">Topics</h3>
+          <div class="topic-list" id="topic-list">
+            <label class="topic-item">
+              <input type="checkbox" value="Models" checked />
+              <span class="topic-pill models">Models</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Agents" checked />
+              <span class="topic-pill agents">Agents</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Infrastructure" checked />
+              <span class="topic-pill infrastructure">Infrastructure</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Research" checked />
+              <span class="topic-pill research">Research</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Policy" checked />
+              <span class="topic-pill policy">Policy</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Open Source" checked />
+              <span class="topic-pill opensource">Open Source</span>
+            </label>
+          </div>
+        </div>
+
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="digest-btn" id="digest-btn">
+          📧 Send Digest Now
+        </button>
+        <div class="stats-box">
+          <div class="stat">
+            <span class="stat-num" id="stat-count">—</span>
+            <span class="stat-label">stories</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-num" id="stat-filtered">—</span>
+            <span class="stat-label">showing</span>
+          </div>
+        </div>
+        <p class="last-updated" id="last-updated">Loading...</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+          <h1 class="page-title">Today's Briefing</h1>
+          <span class="today-date" id="today-date"></span>
+        </div>
+        <div class="topbar-right">
+          <div class="toggle-group" id="detail-toggle">
+            <button class="toggle-btn active" data-mode="short">
+              ⚡ 5-Min Read
+            </button>
+            <button class="toggle-btn" data-mode="full">
+              📖 Full Briefing
+            </button>
+          </div>
+          <button class="refresh-btn" id="refresh-btn" onclick="refreshNews()">
+            <span class="refresh-icon">↻</span>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- No API Key Banner -->
+      <div class="api-banner" id="api-banner" style="display:none">
+        <span>⚠️</span>
+        <span>
+          <strong>AI features disabled:</strong> Add a free <code>HF_TOKEN</code> from <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener" style="color:#92400e">huggingface.co/settings/tokens</a> to your <code>.env</code> to enable Personalize &amp; Content Angles.
+        </span>
+      </div>
+
+      <!-- Stories Grid -->
+      <div class="stories-container">
+        <div class="stories-grid" id="stories-grid">
+          <!-- Skeletons shown on load -->
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+          <div class="skeleton-card"></div>
+        </div>
+
+        <div class="empty-state" id="empty-state" style="display:none">
+          <div class="empty-icon">🔍</div>
+          <h3>No stories match your filters</h3>
+          <p>Try selecting different topics or refreshing the feed.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/static/app.js?v=2"></script>
+</body>
+</html>

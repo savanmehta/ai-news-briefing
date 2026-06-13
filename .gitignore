@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+news_cache.json
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+.DS_Store
+server.log
+.claude/
+stock-analyst/
