@@ -72,6 +72,17 @@ def filter_recent(stories: List[Dict], hours: int = 24) -> List[Dict]:
     return recent if len(recent) >= 10 else stories
 
 
+def filter_by_topics(stories: List[Dict], topics: Optional[List[str]]) -> List[Dict]:
+    """Keep stories that match one of the given topics, or have no topics at all."""
+    if not topics:
+        return stories
+    topic_set = set(topics)
+    return [
+        s for s in stories
+        if not s.get("topics") or any(t in topic_set for t in s.get("topics", []))
+    ]
+
+
 def select_diverse(stories: List[Dict]) -> List[Dict]:
     """Round-robin across categories in priority order, respecting per-category caps."""
     by_cat: Dict[str, List[Dict]] = defaultdict(list)
@@ -190,26 +201,33 @@ def build_digest_html(stories: List[Dict]) -> Tuple[str, str]:
 
 # ── SMTP sender ───────────────────────────────────────────────────────────────
 
-def send_digest(all_stories: List[Dict]) -> Dict:
-    """Filter, select, build, and send the digest. Returns a status dict."""
-    to_addr   = os.environ.get("DIGEST_EMAIL_TO", "").strip()
+def send_digest_to(
+    all_stories: List[Dict],
+    to_addr: str,
+    topics: Optional[List[str]] = None,
+    hours: int = 24,
+    subject_suffix: str = "",
+) -> Dict:
+    """Filter (by recency + topics), select, build, and send a digest to `to_addr`."""
     from_addr = os.environ.get("DIGEST_EMAIL_FROM", "").strip()
     password  = os.environ.get("GMAIL_APP_PASSWORD", "").strip()
 
     missing = [k for k, v in {
-        "DIGEST_EMAIL_TO": to_addr,
         "DIGEST_EMAIL_FROM": from_addr,
         "GMAIL_APP_PASSWORD": password,
     }.items() if not v]
     if missing:
         return {"ok": False, "error": f"Missing .env keys: {', '.join(missing)}"}
 
-    recent   = filter_recent(all_stories, hours=24)
-    selected = select_diverse(recent)
+    recent   = filter_recent(all_stories, hours=hours)
+    relevant = filter_by_topics(recent, topics)
+    selected = select_diverse(relevant)
     if not selected:
         return {"ok": False, "error": "No stories available to send"}
 
     subject, html_body = build_digest_html(selected)
+    if subject_suffix:
+        subject = f"{subject} — {subject_suffix}"
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -243,3 +261,11 @@ def send_digest(all_stories: List[Dict]) -> Dict:
         }
     except Exception as e:
         return {"ok": False, "error": str(e)}
+
+
+def send_digest(all_stories: List[Dict]) -> Dict:
+    """Send the global admin digest (DIGEST_EMAIL_TO). Returns a status dict."""
+    to_addr = os.environ.get("DIGEST_EMAIL_TO", "").strip()
+    if not to_addr:
+        return {"ok": False, "error": "Missing .env key: DIGEST_EMAIL_TO"}
+    return send_digest_to(all_stories, to_addr, hours=24)

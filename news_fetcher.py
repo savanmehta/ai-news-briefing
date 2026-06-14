@@ -24,6 +24,8 @@ RSS_FEEDS = [
     # Company blogs
     {"url": "https://openai.com/blog/rss.xml",       "source": "OpenAI Blog",     "category": "Company"},
     {"url": "https://deepmind.google/blog/rss.xml",  "source": "Google DeepMind", "category": "Company"},
+    # Anthropic has no public RSS feed (anthropic.com/research is JS-rendered, no /rss.xml).
+    # Uber Engineering's RSS (uber.com/blog/.../engineering/rss/) returns 406 — blocked by Akamai bot detection.
     # Newsletters / Substacks (6 confirmed working feeds)
     {"url": "https://aishwaryasrinivasan.substack.com/feed",  "source": "AI with Aish",       "category": "Newsletter"},
     {"url": "https://importai.substack.com/feed",             "source": "Import AI",          "category": "Newsletter"},
@@ -133,12 +135,15 @@ async def fetch_rss_feed(client: httpx.AsyncClient, feed_info: dict) -> List[Dic
             elif hasattr(entry, "media_content") and entry.media_content:
                 image_url = entry.media_content[0].get("url")
 
+            author = entry.get("author", "").strip() or None
+
             stories.append({
                 "id": make_id(title, link),
                 "title": title,
                 "summary": summary,
                 "url": link,
                 "source": feed_info["source"],
+                "author": author,
                 "category": feed_info["category"],
                 "published": _get_published(entry),
                 "topics": [],
@@ -421,6 +426,130 @@ async def fetch_github_trending() -> List[Dict]:
     return stories[:12]
 
 
+# ── Anthropic Research (no RSS feed — scrape /research listing) ────────────────
+
+SCRAPE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+
+async def _fetch_og_meta(client: httpx.AsyncClient, url: str) -> Optional[Dict]:
+    """Fetch a single article page and pull og:title / og:description / og:image."""
+    try:
+        r = await client.get(url)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        title = soup.find("meta", property="og:title")
+        desc  = soup.find("meta", property="og:description")
+        img   = soup.find("meta", property="og:image")
+        if not title or not title.get("content"):
+            return None
+        return {
+            "title": title["content"].strip(),
+            "summary": (desc["content"].strip() if desc and desc.get("content") else ""),
+            "image_url": img["content"] if img and img.get("content") else None,
+        }
+    except Exception:
+        return None
+
+
+async def fetch_anthropic_research() -> List[Dict]:
+    """Scrape anthropic.com/research — no public RSS feed available."""
+    try:
+        async with httpx.AsyncClient(
+            headers=SCRAPE_HEADERS, follow_redirects=True, timeout=15.0
+        ) as client:
+            r = await client.get("https://www.anthropic.com/research")
+            r.raise_for_status()
+
+            paths = sorted(set(re.findall(r'href="(/research/[a-z0-9\-]+)"', r.text)))[:8]
+            urls = [f"https://www.anthropic.com{p}" for p in paths]
+
+            metas = await asyncio.gather(*[_fetch_og_meta(client, u) for u in urls])
+
+        stories: List[Dict] = []
+        for url, meta in zip(urls, metas):
+            if not meta:
+                continue
+            stories.append({
+                "id": make_id(meta["title"], url),
+                "title": meta["title"],
+                "summary": meta["summary"],
+                "url": url,
+                "source": "Anthropic Research",
+                "category": "Company",
+                "published": None,
+                "topics": ["Research"],
+                "image_url": meta["image_url"],
+            })
+        return stories
+    except Exception as e:
+        print(f"Anthropic Research error: {type(e).__name__}: {e}")
+        return []
+
+
+# ── Uber Engineering blog (no RSS feed — scrape blog listing) ──────────────────
+
+UBER_CATEGORY_SLUGS = {
+    "engineering", "advertising", "earn", "ride", "eat", "merchants",
+    "business", "health", "higher-education", "transit",
+    "community-support", "freight", "blog",
+}
+
+
+async def fetch_uber_engineering() -> List[Dict]:
+    """Scrape uber.com engineering blog — RSS feed is blocked by Akamai (406)."""
+    try:
+        async with httpx.AsyncClient(
+            headers=SCRAPE_HEADERS, follow_redirects=True, timeout=15.0
+        ) as client:
+            r = await client.get("https://www.uber.com/us/en/blog/engineering/")
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, "html.parser")
+
+            pattern = re.compile(r"^https://www\.uber\.com/us/en/blog/[a-z0-9\-]+/$")
+            urls: List[str] = []
+            seen_urls: set = set()
+            for a in soup.find_all("a", href=True):
+                href = a["href"]
+                if not pattern.match(href):
+                    continue
+                slug = href.rstrip("/").rsplit("/", 1)[-1]
+                if slug in UBER_CATEGORY_SLUGS or href in seen_urls:
+                    continue
+                seen_urls.add(href)
+                urls.append(href)
+                if len(urls) >= 8:
+                    break
+
+            metas = await asyncio.gather(*[_fetch_og_meta(client, u) for u in urls])
+
+        stories: List[Dict] = []
+        for url, meta in zip(urls, metas):
+            if not meta:
+                continue
+            stories.append({
+                "id": make_id(meta["title"], url),
+                "title": meta["title"],
+                "summary": meta["summary"],
+                "url": url,
+                "source": "Uber Engineering",
+                "category": "Company",
+                "published": None,
+                "topics": ["Infrastructure"],
+                "image_url": meta["image_url"],
+            })
+        return stories
+    except Exception as e:
+        print(f"Uber Engineering error: {type(e).__name__}: {e}")
+        return []
+
+
 # ── Main aggregator ───────────────────────────────────────────────────────────
 
 async def fetch_all_news() -> List[Dict]:
@@ -439,12 +568,14 @@ async def fetch_all_news() -> List[Dict]:
         rss_results = await asyncio.gather(*rss_tasks, return_exceptions=True)
 
     # Independent fetchers run concurrently
-    hn, gh_trending, gh_releases, nitter, hf_papers = await asyncio.gather(
+    hn, gh_trending, gh_releases, nitter, hf_papers, anthropic_research, uber_eng = await asyncio.gather(
         fetch_hackernews(),
         fetch_github_trending(),
         fetch_github_releases(),
         fetch_nitter_feeds(),
         fetch_huggingface_papers(),
+        fetch_anthropic_research(),
+        fetch_uber_engineering(),
     )
 
     all_stories: List[Dict] = []
@@ -456,6 +587,8 @@ async def fetch_all_news() -> List[Dict]:
     all_stories.extend(gh_releases)
     all_stories.extend(nitter)
     all_stories.extend(hf_papers)
+    all_stories.extend(anthropic_research)
+    all_stories.extend(uber_eng)
 
     # Deduplicate by ID
     seen: set = set()
@@ -465,6 +598,6 @@ async def fetch_all_news() -> List[Dict]:
             seen.add(story["id"])
             unique.append(story)
 
-    total_sources = len(RSS_FEEDS) + 5  # +HN, GH Trending, GH Releases, Nitter, HF Papers
+    total_sources = len(RSS_FEEDS) + 7  # +HN, GH Trending, GH Releases, Nitter, HF Papers, Anthropic, Uber
     print(f"Fetched {len(unique)} unique stories from {total_sources} source groups")
     return unique
