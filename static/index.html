@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=2" />
+  <link rel="stylesheet" href="/static/style.css?v=5" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="app">
@@ -123,6 +124,15 @@
             <span class="refresh-icon">↻</span>
             <span>Refresh</span>
           </button>
+          <button class="btn btn-secondary" id="favorites-toggle" title="Show only your favorites">
+            ★ My Favorites
+          </button>
+          <button class="btn btn-secondary" id="settings-btn" title="Preferences">
+            ⚙ Settings
+          </button>
+          <div class="auth-area" id="auth-area">
+            <button class="btn btn-secondary" id="login-btn">Sign in</button>
+          </div>
         </div>
       </header>
 
@@ -159,6 +169,76 @@
   <!-- Toast Notifications -->
   <div class="toast-container" id="toast-container"></div>
 
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-overlay" style="display:none">
+    <div class="modal" id="settings-modal">
+      <div class="modal-header">
+        <h2>Preferences</h2>
+        <button class="modal-close" id="settings-close" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-section">
+          <h3>Default Role</h3>
+          <select id="pref-role" class="modal-select">
+            <option value="Developer">👨‍💻 Developer</option>
+            <option value="Founder">🚀 Founder</option>
+            <option value="Content Creator">✍️ Content Creator</option>
+            <option value="Non-Technical">🧑 Non-Technical</option>
+          </select>
+        </div>
+
+        <div class="modal-section">
+          <h3>Topics</h3>
+          <div class="topic-list" id="pref-topic-list">
+            <label class="topic-item">
+              <input type="checkbox" value="Models" />
+              <span class="topic-pill models">Models</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Agents" />
+              <span class="topic-pill agents">Agents</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Infrastructure" />
+              <span class="topic-pill infrastructure">Infrastructure</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Research" />
+              <span class="topic-pill research">Research</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Policy" />
+              <span class="topic-pill policy">Policy</span>
+            </label>
+            <label class="topic-item">
+              <input type="checkbox" value="Open Source" />
+              <span class="topic-pill opensource">Open Source</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3>Email Digests</h3>
+          <label class="modal-checkbox">
+            <input type="checkbox" id="pref-daily-digest" />
+            <span>Daily digest</span>
+          </label>
+          <label class="modal-checkbox">
+            <input type="checkbox" id="pref-weekly-digest" />
+            <span>Weekly recap</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="settings-cancel">Cancel</button>
+        <button class="btn btn-primary" id="settings-save">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/auth.js?v=1"></script>
   <script src="/static/app.js?v=2"></script>
 </body>
 </html>

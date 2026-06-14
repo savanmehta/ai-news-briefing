@@ -5,6 +5,9 @@ const state = {
   detailLevel: 'short',
   activeTopics: new Set(['Models', 'Agents', 'Infrastructure', 'Research', 'Policy', 'Open Source']),
   hasApiKey: false,
+  favoriteIds: new Set(),
+  readIds: new Set(),
+  showFavoritesOnly: false,
 };
 
 /* ─── Init ────────────────────────────────────────────────── */
@@ -14,9 +17,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   bindRoleButtons();
   bindTopicCheckboxes();
   bindDetailToggle();
+  bindFavoritesToggle();
+  bindSettingsModal();
   await checkStatus();
   await loadNews();
+  await loadUserData();
 });
+
+/* ─── User Data (favorites / read) ───────────────────────────── */
+async function loadUserData() {
+  if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+    state.favoriteIds = new Set();
+    state.readIds = new Set();
+    renderStories();
+    return;
+  }
+
+  try {
+    const [favRes, readRes] = await Promise.all([
+      authFetch('/api/favorites'),
+      authFetch('/api/read'),
+    ]);
+    const favData = await favRes.json();
+    const readData = await readRes.json();
+    state.favoriteIds = new Set((favData.favorites || []).map(f => f.article_id));
+    state.readIds = new Set(readData.read_ids || []);
+  } catch (e) {
+    state.favoriteIds = new Set();
+    state.readIds = new Set();
+  }
+  renderStories();
+}
+
+/* Called by auth.js on sign-in/sign-out */
+async function onAuthChanged() {
+  await loadUserData();
+}
 
 function setTodayDate() {
   const el = document.getElementById('today-date');
@@ -92,10 +128,16 @@ async function refreshNews() {
 
 /* ─── Filtering ───────────────────────────────────────────── */
 function getFilteredStories() {
-  if (state.activeTopics.size === 0) return [];
-  if (state.activeTopics.size === 6) return state.stories;
+  let stories = state.stories;
 
-  return state.stories.filter(story => {
+  if (state.showFavoritesOnly) {
+    stories = stories.filter(s => state.favoriteIds.has(s.id));
+  }
+
+  if (state.activeTopics.size === 0) return [];
+  if (state.activeTopics.size === 6) return stories;
+
+  return stories.filter(story => {
     const topics = story.topics || [];
     return topics.length === 0 || topics.some(t => state.activeTopics.has(t));
   });
@@ -128,13 +170,22 @@ function renderCard(story) {
 
   const catClass = 'cat-' + (story.category || 'industry').toLowerCase().replace(/\s+/g, '-');
   const dateStr = formatDate(story.published);
+  const isFavorited = state.favoriteIds.has(story.id);
+  const isRead = state.readIds.has(story.id);
 
   return `
-    <div class="story-card" id="card-${story.id}">
+    <div class="story-card ${isRead ? 'is-read' : ''}" id="card-${story.id}">
       <div class="card-meta">
         <span class="source-badge ${catClass}">${escHtml(story.source)}</span>
+        ${story.author ? `<span class="story-author">by ${escHtml(story.author)}</span>` : ''}
         ${story.topics && story.topics.length ? `<div class="card-topics">${topicTags}</div>` : ''}
         ${dateStr ? `<span class="story-date">${dateStr}</span>` : ''}
+        <button
+          class="favorite-btn ${isFavorited ? 'active' : ''}"
+          data-action="favorite"
+          data-id="${story.id}"
+          title="${isFavorited ? 'Remove from favorites' : 'Save to favorites'}"
+        >${isFavorited ? '★' : '☆'}</button>
       </div>
 
       <h3 class="story-title">
@@ -162,7 +213,7 @@ function renderCard(story) {
         >
           Content Angles
         </button>
-        <a href="${escHtml(story.url)}" target="_blank" rel="noopener" class="btn btn-ghost">
+        <a href="${escHtml(story.url)}" target="_blank" rel="noopener" class="btn btn-ghost" data-action="read" data-id="${story.id}">
           Read ↗
         </a>
       </div>
@@ -183,7 +234,144 @@ document.addEventListener('click', async (e) => {
   if (action === 'personalize') await handlePersonalize(id, btn);
   if (action === 'angles') await handleAngles(id, btn);
   if (action === 'copy') handleCopy(btn);
+  if (action === 'favorite') await handleFavorite(id, btn);
+  if (action === 'read') handleMarkRead(id);
 });
+
+/* ─── Favorites ───────────────────────────────────────────── */
+async function handleFavorite(storyId, btn) {
+  if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+    showToast('Sign in to save favorites', 'info');
+    return;
+  }
+
+  const isFavorited = state.favoriteIds.has(storyId);
+  try {
+    await toggleFavorite(storyId, isFavorited);
+    if (isFavorited) {
+      state.favoriteIds.delete(storyId);
+      btn.classList.remove('active');
+      btn.textContent = '☆';
+      btn.title = 'Save to favorites';
+    } else {
+      state.favoriteIds.add(storyId);
+      btn.classList.add('active');
+      btn.textContent = '★';
+      btn.title = 'Remove from favorites';
+    }
+    if (state.showFavoritesOnly) renderStories();
+  } catch (e) {
+    showToast('Failed to update favorite', 'error');
+  }
+}
+
+/* ─── Read Tracking ───────────────────────────────────────── */
+function handleMarkRead(storyId) {
+  if (typeof isLoggedIn !== 'function' || !isLoggedIn()) return;
+  if (state.readIds.has(storyId)) return;
+
+  state.readIds.add(storyId);
+  const card = document.getElementById(`card-${storyId}`);
+  if (card) card.classList.add('is-read');
+
+  markRead(storyId).catch(() => {});
+}
+
+/* ─── Settings Modal ──────────────────────────────────────── */
+function bindSettingsModal() {
+  const overlay = document.getElementById('settings-overlay');
+  const openBtn = document.getElementById('settings-btn');
+  const closeBtn = document.getElementById('settings-close');
+  const cancelBtn = document.getElementById('settings-cancel');
+  const saveBtn = document.getElementById('settings-save');
+
+  const close = () => { overlay.style.display = 'none'; };
+
+  openBtn.addEventListener('click', async () => {
+    if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+      showToast('Sign in to manage preferences', 'info');
+      return;
+    }
+    overlay.style.display = 'flex';
+    await loadPreferences();
+  });
+
+  closeBtn.addEventListener('click', close);
+  cancelBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  saveBtn.addEventListener('click', () => savePreferences(close));
+}
+
+async function loadPreferences() {
+  try {
+    const res = await authFetch('/api/preferences');
+    const prefs = await res.json();
+
+    document.getElementById('pref-role').value = prefs.role || 'Developer';
+
+    const topics = new Set(prefs.topics || []);
+    document.querySelectorAll('#pref-topic-list input[type="checkbox"]').forEach(cb => {
+      cb.checked = topics.has(cb.value);
+    });
+
+    document.getElementById('pref-daily-digest').checked = !!prefs.daily_digest;
+    document.getElementById('pref-weekly-digest').checked = !!prefs.weekly_digest;
+  } catch (e) {
+    showToast('Failed to load preferences', 'error');
+  }
+}
+
+async function savePreferences(onDone) {
+  const saveBtn = document.getElementById('settings-save');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+
+  const topics = [...document.querySelectorAll('#pref-topic-list input[type="checkbox"]:checked')]
+    .map(cb => cb.value);
+
+  const body = {
+    role: document.getElementById('pref-role').value,
+    topics,
+    daily_digest: document.getElementById('pref-daily-digest').checked,
+    weekly_digest: document.getElementById('pref-weekly-digest').checked,
+  };
+
+  try {
+    const res = await authFetch('/api/preferences', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    showToast('Preferences saved', 'success');
+    onDone();
+  } catch (e) {
+    showToast('Failed to save preferences', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Preferences';
+  }
+}
+
+/* ─── Favorites Filter Toggle ────────────────────────────────── */
+function bindFavoritesToggle() {
+  const btn = document.getElementById('favorites-toggle');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+      showToast('Sign in to view favorites', 'info');
+      return;
+    }
+    state.showFavoritesOnly = !state.showFavoritesOnly;
+    btn.classList.toggle('active', state.showFavoritesOnly);
+    renderStories();
+  });
+}
 
 /* ─── Personalize ─────────────────────────────────────────── */
 async function handlePersonalize(storyId, btn) {
