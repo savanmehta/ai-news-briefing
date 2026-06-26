@@ -1,9 +1,10 @@
 import re
+import html
 import feedparser
 import httpx
 import asyncio
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Dict, Optional
 from bs4 import BeautifulSoup
 
@@ -550,6 +551,60 @@ async def fetch_uber_engineering() -> List[Dict]:
         return []
 
 
+# ── Personal Medium blog ────────────────────────────────────────────────────
+
+MEDIUM_FEED_URL = "https://medium.com/feed/@savan.mehta90"
+
+
+async def fetch_medium_articles() -> List[Dict]:
+    """Pull the user's own published Medium articles via RSS."""
+    try:
+        async with httpx.AsyncClient(
+            headers=SCRAPE_HEADERS, follow_redirects=True, timeout=15.0
+        ) as client:
+            r = await client.get(MEDIUM_FEED_URL)
+            r.raise_for_status()
+            feed = feedparser.parse(r.text)
+
+        stories: List[Dict] = []
+        for entry in feed.entries:
+            title = html.unescape(entry.get("title", "").strip())
+            url = entry.get("link", "")
+            if not title or not url:
+                continue
+
+            raw_content = (
+                entry.get("content", [{}])[0].get("value", "")
+                if entry.get("content") else entry.get("summary", "")
+            )
+            img_match = re.search(r'<img[^>]+src="([^"]+)"', raw_content)
+            image_url = img_match.group(1) if img_match else None
+
+            text = re.sub(r"<[^>]+>", " ", raw_content)
+            text = re.sub(r"\s+", " ", text).strip()
+            summary = html.unescape(text[:400])
+
+            published = ""
+            if entry.get("published_parsed"):
+                published = datetime(*entry["published_parsed"][:6], tzinfo=timezone.utc).isoformat()
+
+            stories.append({
+                "id": make_id(title, url),
+                "title": title,
+                "summary": summary,
+                "url": url,
+                "source": "Savan's Blog",
+                "category": "My Blog",
+                "published": published or None,
+                "topics": ["My Blog"],
+                "image_url": image_url,
+            })
+        return stories
+    except Exception as e:
+        print(f"Medium blog error: {type(e).__name__}: {e}")
+        return []
+
+
 # ── Main aggregator ───────────────────────────────────────────────────────────
 
 async def fetch_all_news() -> List[Dict]:
@@ -568,7 +623,7 @@ async def fetch_all_news() -> List[Dict]:
         rss_results = await asyncio.gather(*rss_tasks, return_exceptions=True)
 
     # Independent fetchers run concurrently
-    hn, gh_trending, gh_releases, nitter, hf_papers, anthropic_research, uber_eng = await asyncio.gather(
+    hn, gh_trending, gh_releases, nitter, hf_papers, anthropic_research, uber_eng, medium_blog = await asyncio.gather(
         fetch_hackernews(),
         fetch_github_trending(),
         fetch_github_releases(),
@@ -576,6 +631,7 @@ async def fetch_all_news() -> List[Dict]:
         fetch_huggingface_papers(),
         fetch_anthropic_research(),
         fetch_uber_engineering(),
+        fetch_medium_articles(),
     )
 
     all_stories: List[Dict] = []
@@ -589,6 +645,7 @@ async def fetch_all_news() -> List[Dict]:
     all_stories.extend(hf_papers)
     all_stories.extend(anthropic_research)
     all_stories.extend(uber_eng)
+    all_stories.extend(medium_blog)
 
     # Deduplicate by ID
     seen: set = set()
@@ -598,6 +655,6 @@ async def fetch_all_news() -> List[Dict]:
             seen.add(story["id"])
             unique.append(story)
 
-    total_sources = len(RSS_FEEDS) + 7  # +HN, GH Trending, GH Releases, Nitter, HF Papers, Anthropic, Uber
+    total_sources = len(RSS_FEEDS) + 8  # +HN, GH Trending, GH Releases, Nitter, HF Papers, Anthropic, Uber, Medium
     print(f"Fetched {len(unique)} unique stories from {total_sources} source groups")
     return unique

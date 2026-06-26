@@ -1,9 +1,12 @@
+const ADMIN_EMAIL = 'sevimehta90@gmail.com';
+
 /* ─── State ───────────────────────────────────────────────── */
 const state = {
   stories: [],
   role: 'Developer',
   detailLevel: 'short',
   activeTopics: new Set(['Models', 'Agents', 'Infrastructure', 'Research', 'Policy', 'Open Source']),
+  activeView: 'news',
   hasApiKey: false,
   favoriteIds: new Set(),
   readIds: new Set(),
@@ -17,11 +20,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   bindRoleButtons();
   bindTopicCheckboxes();
   bindDetailToggle();
+  bindViewTabs();
   bindFavoritesToggle();
   bindSettingsModal();
   await checkStatus();
   await loadNews();
   await loadUserData();
+  updateAuthGatedUI();
 });
 
 /* ─── User Data (favorites / read) ───────────────────────────── */
@@ -52,6 +57,23 @@ async function loadUserData() {
 /* Called by auth.js on sign-in/sign-out */
 async function onAuthChanged() {
   await loadUserData();
+  updateAuthGatedUI();
+}
+
+/* Show/hide admin-only and sign-in-only controls based on auth state */
+function updateAuthGatedUI() {
+  const loggedIn = typeof isLoggedIn === 'function' && isLoggedIn();
+  const email = loggedIn ? auth.session.user.email : null;
+
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn) {
+    refreshBtn.style.display = (loggedIn && email === ADMIN_EMAIL) ? '' : 'none';
+  }
+
+  const digestBtn = document.getElementById('digest-btn');
+  if (digestBtn) {
+    digestBtn.style.display = loggedIn ? '' : 'none';
+  }
 }
 
 function setTodayDate() {
@@ -112,14 +134,15 @@ async function refreshNews() {
   btn.classList.add('spinning');
 
   try {
-    const res = await fetch('/api/refresh', { method: 'POST' });
+    const res = await authFetch('/api/refresh', { method: 'POST' });
     const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Refresh failed');
     state.stories = data.stories || [];
     updateSidebarStats(data.last_updated);
     renderStories();
     showToast(`Refreshed — ${data.count} stories loaded`, 'success');
   } catch (e) {
-    showToast('Refresh failed', 'error');
+    showToast(e.message === 'Not signed in' ? 'Sign in as admin to refresh' : 'Refresh failed', 'error');
   } finally {
     btn.disabled = false;
     btn.classList.remove('spinning');
@@ -129,6 +152,16 @@ async function refreshNews() {
 /* ─── Filtering ───────────────────────────────────────────── */
 function getFilteredStories() {
   let stories = state.stories;
+
+  if (state.activeView === 'blog') {
+    stories = stories.filter(s => s.source === "Savan's Blog");
+    if (state.showFavoritesOnly) {
+      stories = stories.filter(s => state.favoriteIds.has(s.id));
+    }
+    return stories;
+  }
+
+  stories = stories.filter(s => s.source !== "Savan's Blog");
 
   if (state.showFavoritesOnly) {
     stories = stories.filter(s => state.favoriteIds.has(s.id));
@@ -154,6 +187,12 @@ function renderStories() {
 
   if (filtered.length === 0) {
     grid.innerHTML = '';
+    emptyState.querySelector('h3').textContent =
+      state.activeView === 'blog' ? 'No blog posts yet' : 'No stories match your filters';
+    emptyState.querySelector('p').textContent =
+      state.activeView === 'blog'
+        ? 'Check back soon for new articles.'
+        : 'Try selecting different topics or refreshing the feed.';
     emptyState.style.display = 'block';
     return;
   }
@@ -172,9 +211,11 @@ function renderCard(story) {
   const dateStr = formatDate(story.published);
   const isFavorited = state.favoriteIds.has(story.id);
   const isRead = state.readIds.has(story.id);
+  const isBlog = story.source === "Savan's Blog";
 
   return `
-    <div class="story-card ${isRead ? 'is-read' : ''}" id="card-${story.id}">
+    <div class="story-card ${isRead ? 'is-read' : ''} ${isBlog ? 'blog-card' : ''}" id="card-${story.id}">
+      ${isBlog && story.image_url ? `<img class="blog-card-image" src="${escHtml(story.image_url)}" alt="" loading="lazy" />` : ''}
       <div class="card-meta">
         <span class="source-badge ${catClass}">${escHtml(story.source)}</span>
         ${story.author ? `<span class="story-author">by ${escHtml(story.author)}</span>` : ''}
@@ -588,6 +629,38 @@ function bindDetailToggle() {
   });
 }
 
+function bindViewTabs() {
+  document.getElementById('view-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('.toggle-btn');
+    if (!btn) return;
+    setActiveView(btn.dataset.view);
+  });
+
+  const ctaBtn = document.getElementById('blog-cta-btn');
+  if (ctaBtn) {
+    ctaBtn.addEventListener('click', () => {
+      setActiveView('blog');
+      ctaBtn.classList.add('visited');
+      // Close mobile sidebar after navigation
+      document.getElementById('sidebar')?.classList.remove('open');
+      document.getElementById('sidebar-overlay')?.classList.remove('open');
+    });
+  }
+}
+
+function setActiveView(view) {
+  state.activeView = view;
+
+  document.querySelectorAll('#view-toggle .toggle-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === view);
+  });
+
+  const title = document.getElementById('page-title');
+  title.textContent = view === 'blog' ? "Savan's Blog" : "Today's Briefing";
+
+  renderStories();
+}
+
 /* ─── Sidebar Stats ───────────────────────────────────────── */
 function updateSidebarStats(lastUpdated) {
   if (lastUpdated) {
@@ -606,6 +679,7 @@ function topicClass(topic) {
     'Research': 'research',
     'Policy': 'policy',
     'Open Source': 'open-source',
+    'My Blog': 'my-blog',
   };
   return map[topic] || 'models';
 }
@@ -645,7 +719,7 @@ async function sendDigest() {
   btn.textContent = '📧 Sending…';
 
   try {
-    const res = await fetch('/api/send-digest', { method: 'POST' });
+    const res = await authFetch('/api/send-digest', { method: 'POST' });
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.detail || 'Send failed');

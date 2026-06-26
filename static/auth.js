@@ -6,8 +6,7 @@ const auth = {
 
 async function initAuth() {
   try {
-    const res = await fetch('/api/config');
-    const { supabase_url, supabase_anon_key } = await res.json();
+    const { supabase_url, supabase_anon_key } = window.APP_CONFIG;
     auth.client = window.supabase.createClient(supabase_url, supabase_anon_key);
   } catch (e) {
     console.error('Failed to init Supabase client', e);

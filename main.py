@@ -5,12 +5,11 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Depends
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
 
 from supabase_cache import SupabaseCache
 from news_fetcher import fetch_all_news
@@ -92,7 +91,7 @@ async def lifespan(app: FastAPI):
     await refresh_news()
     scheduler.add_job(
         refresh_news,
-        IntervalTrigger(hours=2),
+        CronTrigger(hour=1, minute=30),   # 7:00 AM IST (server runs in UTC)
         id="news_refresh",
         replace_existing=True,
     )
@@ -125,7 +124,49 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    return Path("static/index.html").read_text()
+    html = Path("static/index.html").read_text()
+    config_script = (
+        f'<script>window.APP_CONFIG='
+        f'{{"supabase_url":"{os.environ["SUPABASE_URL"]}","supabase_anon_key":"{os.environ["SUPABASE_ANON_KEY"]}"}}'
+        f'</script>'
+    )
+    return html.replace("</head>", f"{config_script}\n</head>", 1)
+
+
+@app.api_route("/google3b9dd820e262a933.html", methods=["GET", "HEAD"])
+async def google_verify():
+    return HTMLResponse("google-site-verification: google3b9dd820e262a933.html")
+
+
+@app.api_route("/robots.txt", methods=["GET", "HEAD"])
+async def robots():
+    return PlainTextResponse("""User-agent: *
+Allow: /
+Sitemap: https://www.aiwithsavan.xyz/sitemap.xml
+""")
+
+
+@app.api_route("/sitemap.xml", methods=["GET", "HEAD"])
+async def sitemap():
+    content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.aiwithsavan.xyz/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>"""
+    return Response(content=content, media_type="application/xml")
+
+
+@app.get("/savan", response_class=HTMLResponse)
+async def savan_portfolio():
+    return Path("static/savan.html").read_text()
+
+
+@app.get("/savan/resume", response_class=HTMLResponse)
+async def savan_resume():
+    return Path("static/savan-resume.html").read_text()
 
 
 @app.get("/api/news")
@@ -144,8 +185,14 @@ async def get_news(topics: str = ""):
     }
 
 
+ADMIN_EMAIL = "sevimehta90@gmail.com"
+
+
 @app.post("/api/refresh")
-async def trigger_refresh():
+async def trigger_refresh(ctx: dict = Depends(get_current_user)):
+    if ctx["user"].email != ADMIN_EMAIL:
+        raise HTTPException(status_code=403, detail="Only the admin can trigger a manual refresh")
+
     await refresh_news()
     return {
         "stories": cache.get_all(),
@@ -187,20 +234,27 @@ async def content_angles(request: dict):
 
 
 @app.post("/api/send-digest")
-async def send_digest_endpoint():
+async def send_digest_endpoint(ctx: dict = Depends(get_current_user)):
+    user = ctx["user"]
+    profile = (
+        admin_client.table("profiles")
+        .select("topics")
+        .eq("user_id", user.id)
+        .single()
+        .execute()
+        .data
+        or {}
+    )
+
     loop = asyncio.get_event_loop()
-    result = await loop.run_in_executor(None, lambda: send_digest(cache.get_all()))
+    result = await loop.run_in_executor(
+        None,
+        lambda: send_digest_to(cache.get_all(), user.email, topics=profile.get("topics")),
+    )
     if not result["ok"]:
         raise HTTPException(status_code=500, detail=result["error"])
     return result
 
-
-@app.get("/api/config")
-async def get_config():
-    return {
-        "supabase_url": os.environ["SUPABASE_URL"],
-        "supabase_anon_key": os.environ["SUPABASE_ANON_KEY"],
-    }
 
 
 @app.get("/api/status")

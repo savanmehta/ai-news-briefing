@@ -40,6 +40,10 @@
   --os-bg: rgba(45,212,191,0.14);       --os-text:      #5eead4;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--main-bg);
@@ -47,6 +51,8 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ─── Layout ──────────────────────────────────────────────── */
@@ -111,6 +117,72 @@ body {
 .nav-section {
   padding: 0 12px;
   margin-bottom: 22px;
+}
+
+/* ─── Author Blog CTA ─────────────────────────────────────── */
+.blog-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 24px);
+  margin: 0 12px 22px;
+  padding: 12px 14px;
+  border: 1px solid rgba(236,72,153,0.35);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(236,72,153,0.18), rgba(167,139,250,0.10));
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.blog-cta:hover {
+  border-color: rgba(236,72,153,0.7);
+  transform: translateY(-1px);
+}
+
+.blog-cta-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.blog-cta-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.blog-cta-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.blog-cta-sub {
+  font-size: 11px;
+  color: var(--sidebar-muted);
+}
+
+.blog-cta-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: #ec4899;
+  border-radius: 20px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+  animation: blog-cta-pulse 2s infinite;
+}
+
+.blog-cta.visited .blog-cta-badge {
+  display: none;
+}
+
+@keyframes blog-cta-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 .nav-label {
@@ -263,6 +335,7 @@ body {
 .main {
   margin-left: var(--sidebar-w);
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -402,7 +475,6 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 16px;
   align-items: stretch;
-  grid-auto-rows: 1fr;
 }
 
 /* ─── Skeleton ────────────────────────────────────────────── */
@@ -440,6 +512,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
 }
 
 .story-card:hover {
@@ -476,6 +549,25 @@ body {
 .source-badge.cat-education   { background: rgba(251,146,60,0.13);  color: #fdba74; }
 .source-badge.cat-social      { background: rgba(244,114,182,0.13); color: #f9a8d4; }
 .source-badge.cat-newsletter  { background: rgba(52,211,153,0.13);  color: #6ee7b7; }
+.source-badge.cat-my-blog     { background: rgba(236,72,153,0.15);  color: #f9a8d4; }
+
+/* ─── My Blog Card ────────────────────────────────────────── */
+.story-card.blog-card {
+  border-color: rgba(236,72,153,0.35);
+  background: linear-gradient(160deg, rgba(236,72,153,0.07), var(--card-bg) 60%);
+}
+
+.story-card.blog-card:hover {
+  border-color: rgba(236,72,153,0.6);
+}
+
+.blog-card-image {
+  width: calc(100% + 40px);
+  margin: -18px -20px 0 -20px;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
 
 .story-author {
   font-size: 11px;
@@ -535,6 +627,7 @@ body {
 .topic-tag.research     { background: var(--research-bg); color: var(--research-text); }
 .topic-tag.policy       { background: var(--policy-bg);   color: var(--policy-text); }
 .topic-tag.open-source  { background: var(--os-bg);       color: var(--os-text); }
+.topic-tag.my-blog       { background: rgba(236,72,153,0.15); color: #f9a8d4; }
 
 .story-title {
   font-size: 15px;
@@ -992,6 +1085,13 @@ body {
 }
 
 /* ─── Responsive ──────────────────────────────────────────── */
+
+/* Laptop: slightly narrower min card width so more columns fit */
+@media (max-width: 1200px) {
+  .stories-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+}
+
+/* Tablet & below: collapsible sidebar */
 @media (max-width: 900px) {
   .menu-toggle { display: inline-block; }
   .sidebar {
@@ -1001,10 +1101,72 @@ body {
   .sidebar.open { transform: translateX(0); display: flex; }
   .sidebar-overlay.open { display: block; }
   .main { margin-left: 0; }
-  .stories-grid { grid-template-columns: 1fr; }
+  .stories-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+  .topbar {
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    gap: 10px;
+  }
+  .topbar-right {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .topbar-right::-webkit-scrollbar { display: none; }
+  .toggle-group, .refresh-btn, .btn { flex-shrink: 0; }
 }
 
+/* Mobile phones */
 @media (max-width: 600px) {
-  .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .stories-container { padding: 16px; }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+  .topbar-left { width: 100%; flex-wrap: wrap; }
+  .stories-container { padding: 12px; }
+  .stories-grid { grid-template-columns: 1fr; gap: 12px; grid-auto-rows: auto; align-items: start; }
+
+  .page-title { font-size: 16px; }
+  .today-date { font-size: 12px; }
+
+  /* Collapse all topbar-right controls to icon-only, single row, no scroll */
+  .topbar-right {
+    overflow-x: visible;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-start;
+  }
+  .toggle-label, .btn-label, .refresh-btn .btn-label { display: none; }
+  .toggle-group .toggle-btn,
+  .refresh-btn,
+  #favorites-toggle,
+  #settings-btn {
+    padding: 8px 10px;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+  }
+  .toggle-icon, .btn-icon, .refresh-icon { font-size: 15px; }
+  #login-btn {
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .story-card { padding: 14px 16px; }
+  .blog-card-image { margin: -14px -16px 0 -16px; max-height: 160px; }
+
+  .card-actions .btn span:not(.refresh-icon) { display: inline; }
+  .card-actions .btn { padding: 6px 10px; font-size: 11.5px; }
+
+  .modal { max-width: 95vw; max-height: 90vh; }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .blog-cta-sub { display: none; }
+  .today-date { display: none; }
 }

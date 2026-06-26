@@ -3,12 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Briefing — Daily AI News Dashboard</title>
+
+  <!-- Primary SEO -->
+  <title>AI News Briefing — Daily AI News, Curated & Personalized</title>
+  <meta name="description" content="Stay ahead with AI News Briefing: a daily curated dashboard of the latest AI research, tools, agents, and infrastructure news — personalized to your role and interests." />
+  <meta name="keywords" content="AI news, artificial intelligence, machine learning, LLM, agents, AI research, daily briefing, tech news" />
+  <link rel="canonical" href="https://aiwithsavan.xyz/" />
+  <meta name="author" content="Savan Mehta" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aiwithsavan.xyz/" />
+  <meta property="og:title" content="AI News Briefing — Daily AI News, Curated & Personalized" />
+  <meta property="og:description" content="Stay ahead with a daily curated dashboard of the latest AI research, tools, agents, and infrastructure news — personalized to your role." />
+  <meta property="og:image" content="https://aiwithsavan.xyz/static/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="AI News Briefing" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://aiwithsavan.xyz/" />
+  <meta name="twitter:title" content="AI News Briefing — Daily AI News, Curated & Personalized" />
+  <meta name="twitter:description" content="Stay ahead with a daily curated dashboard of the latest AI research, tools, agents, and infrastructure news — personalized to your role." />
+  <meta name="twitter:image" content="https://aiwithsavan.xyz/static/og-image.png" />
+  <meta name="twitter:creator" content="@savanmehta" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <link rel="apple-touch-icon" href="/static/og-image.png" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AI News Briefing",
+    "url": "https://aiwithsavan.xyz/",
+    "description": "Daily AI news, curated and personalized for developers, founders, and AI practitioners.",
+    "author": {
+      "@type": "Person",
+      "name": "Savan Mehta",
+      "url": "https://medium.com/@savan.mehta90"
+    },
+    "potentialAction": {
+      "@type": "ReadAction",
+      "target": "https://aiwithsavan.xyz/"
+    }
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=5" />
+  <link rel="stylesheet" href="/static/style.css?v=11" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-D8NMDFTFTW"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-D8NMDFTFTW');
+  </script>
 </head>
 <body>
   <div class="app">
@@ -25,6 +85,16 @@
       </div>
 
       <nav class="sidebar-nav">
+
+        <!-- Author Blog CTA -->
+        <button class="blog-cta" id="blog-cta-btn">
+          <span class="blog-cta-icon">✍️</span>
+          <span class="blog-cta-text">
+            <span class="blog-cta-title">Savan's Blog</span>
+            <span class="blog-cta-sub">Read my latest articles</span>
+          </span>
+          <span class="blog-cta-badge">New</span>
+        </button>
 
         <!-- Role Selector -->
         <div class="nav-section">
@@ -108,27 +178,35 @@
       <header class="topbar">
         <div class="topbar-left">
           <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
-          <h1 class="page-title">Today's Briefing</h1>
+          <h1 class="page-title" id="page-title">Today's Briefing</h1>
           <span class="today-date" id="today-date"></span>
         </div>
         <div class="topbar-right">
-          <div class="toggle-group" id="detail-toggle">
-            <button class="toggle-btn active" data-mode="short">
-              ⚡ 5-Min Read
+          <div class="toggle-group" id="view-toggle">
+            <button class="toggle-btn active" data-view="news">
+              <span class="toggle-icon">📰</span><span class="toggle-label"> News Feed</span>
             </button>
-            <button class="toggle-btn" data-mode="full">
-              📖 Full Briefing
+            <button class="toggle-btn" data-view="blog">
+              <span class="toggle-icon">✍️</span><span class="toggle-label"> Savan's Blog</span>
             </button>
           </div>
-          <button class="refresh-btn" id="refresh-btn" onclick="refreshNews()">
+          <div class="toggle-group" id="detail-toggle">
+            <button class="toggle-btn active" data-mode="short">
+              <span class="toggle-icon">⚡</span><span class="toggle-label"> 5-Min Read</span>
+            </button>
+            <button class="toggle-btn" data-mode="full">
+              <span class="toggle-icon">📖</span><span class="toggle-label"> Full Briefing</span>
+            </button>
+          </div>
+          <button class="refresh-btn" id="refresh-btn" onclick="refreshNews()" title="Refresh">
             <span class="refresh-icon">↻</span>
-            <span>Refresh</span>
+            <span class="btn-label">Refresh</span>
           </button>
           <button class="btn btn-secondary" id="favorites-toggle" title="Show only your favorites">
-            ★ My Favorites
+            <span class="btn-icon">★</span><span class="btn-label"> My Favorites</span>
           </button>
           <button class="btn btn-secondary" id="settings-btn" title="Preferences">
-            ⚙ Settings
+            <span class="btn-icon">⚙</span><span class="btn-label"> Settings</span>
           </button>
           <div class="auth-area" id="auth-area">
             <button class="btn btn-secondary" id="login-btn">Sign in</button>
@@ -239,6 +317,6 @@
   </div>
 
   <script src="/static/auth.js?v=1"></script>
-  <script src="/static/app.js?v=2"></script>
+  <script src="/static/app.js?v=4"></script>
 </body>
 </html>

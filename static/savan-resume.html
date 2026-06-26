@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Savan Mehta — Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb;
+      --blue-light: #eff6ff;
+      --text: #111827;
+      --text2: #6b7280;
+      --text3: #9ca3af;
+      --border: #e5e7eb;
+      --bg: #f9fafb;
+    }
+
+    html { background: var(--bg); }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: var(--text);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    /* ── Top bar (screen only) ── */
+    .topbar {
+      background: #0d1117;
+      padding: 12px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-back {
+      color: #8b949e; text-decoration: none; font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .topbar-back:hover { color: #f0f6fc; }
+    .print-btn {
+      background: #2563eb; color: #fff; border: none;
+      padding: 8px 18px; border-radius: 6px; font-size: 13px;
+      font-weight: 600; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .print-btn:hover { background: #1d4ed8; }
+
+    /* ── Resume Paper ── */
+    .paper {
+      max-width: 860px; margin: 28px auto 60px;
+      background: #fff; border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .resume-header {
+      padding: 32px 40px 28px;
+      display: flex; align-items: flex-start; gap: 20px;
+      border-bottom: 3px solid var(--blue);
+    }
+    .resume-photo {
+      width: 84px; height: 84px; border-radius: 50%; flex-shrink: 0;
+      object-fit: cover; object-position: center 15%;
+      border: 2px solid var(--border);
+    }
+    .header-center { flex: 1; min-width: 0; }
+    .resume-name { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+    .resume-title {
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      color: var(--blue); margin-top: 3px; text-transform: uppercase;
+    }
+    .resume-bio {
+      font-size: 12.5px; color: var(--text2);
+      margin-top: 10px; line-height: 1.65;
+    }
+    .resume-contact {
+      flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 5px;
+      align-items: flex-end; font-size: 12px; color: var(--text2);
+    }
+    .resume-contact a { color: var(--text2); text-decoration: none; }
+    .resume-contact a:hover { color: var(--blue); }
+    .contact-row { display: flex; align-items: center; gap: 5px; }
+
+    /* ── Body grid ── */
+    .resume-body {
+      display: grid;
+      grid-template-columns: 1fr 220px;
+      gap: 0;
+    }
+    .col-main { padding: 28px 28px 36px 40px; border-right: 1px solid var(--border); }
+    .col-side { padding: 28px 28px 36px 24px; }
+
+    /* ── Section headers ── */
+    .section-head {
+      font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--blue);
+      border-left: 3px solid var(--blue);
+      padding-left: 8px; margin-bottom: 14px; margin-top: 0;
+    }
+    .section + .section { margin-top: 28px; }
+
+    /* ── Work Experience ── */
+    .job { margin-bottom: 20px; }
+    .job:last-child { margin-bottom: 0; }
+    .job-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .job-company { color: var(--blue); font-weight: 600; font-size: 12.5px; margin-top: 1px; }
+    .job-meta {
+      display: flex; justify-content: space-between;
+      font-size: 11.5px; color: var(--text3); margin: 3px 0 8px;
+    }
+    .job-bullets { padding-left: 16px; }
+    .job-bullets li {
+      margin-bottom: 5px; font-size: 12.5px; color: var(--text2);
+    }
+
+    /* ── Skills ── */
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .skill-tag {
+      background: var(--blue-light); color: var(--blue);
+      padding: 3px 9px; border-radius: 4px; font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    /* ── Education ── */
+    .edu-degree { font-weight: 700; font-size: 13px; }
+    .edu-school { color: var(--text2); font-size: 12px; margin-top: 2px; }
+    .edu-year { color: var(--text3); font-size: 11.5px; }
+
+    /* ── Side sections ── */
+    .side-section + .side-section { margin-top: 24px; }
+    .side-list { list-style: none; }
+    .side-list li {
+      font-size: 12.5px; color: var(--text2);
+      padding: 3px 0; border-bottom: 1px solid var(--border);
+    }
+    .side-list li:last-child { border-bottom: none; }
+    .side-list li strong { color: var(--text); font-weight: 600; display: block; }
+
+    /* ── Print ── */
+    @media print {
+      html { background: #fff; }
+      .topbar { display: none; }
+      .paper {
+        margin: 0; box-shadow: none; border-radius: 0;
+        max-width: 100%;
+      }
+    }
+    @media (max-width: 640px) {
+      .resume-header { flex-wrap: wrap; padding: 20px; gap: 14px; }
+      .resume-photo { width: 64px; height: 64px; }
+      .header-center { min-width: 0; }
+      .resume-contact { width: 100%; align-items: flex-start; margin-top: 4px; }
+      .resume-body { grid-template-columns: 1fr; }
+      .col-main { border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
+      .col-side { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar (hidden on print) -->
+  <div class="topbar">
+    <a href="/savan" class="topbar-back">← aiwithsavan.xyz/savan</a>
+    <button class="print-btn" onclick="window.print()">
+      🖨 Print / Save as PDF
+    </button>
+  </div>
+
+  <div class="paper">
+
+    <!-- Header -->
+    <div class="resume-header">
+      <img class="resume-photo" src="/static/savan-photo.jpg" alt="Savan Mehta" />
+      <div class="header-center">
+        <div class="resume-name">Savankumar Mehta</div>
+        <div class="resume-title">Staff AI Engineer · AI Architect · Full-Stack Engineer</div>
+        <div class="resume-bio">
+          Staff AI Engineer and Architect with 11+ years of experience building autonomous multi-agent systems,
+          production RAG pipelines, and enterprise-grade full-stack platforms. Currently designing agentic AI
+          workflows using LangGraph and Claude for global enterprises at Persistent Systems.
+        </div>
+      </div>
+      <div class="resume-contact">
+        <div class="contact-row">✉ <a href="mailto:savan.mehta90@gmail.com">savan.mehta90@gmail.com</a></div>
+        <div class="contact-row">📞 +91 9731937935</div>
+        <div class="contact-row">📍 Bangalore, India</div>
+        <div class="contact-row">🔗 <a href="https://www.linkedin.com/in/savan-mehta-9626613b" target="_blank">linkedin.com/in/savan-mehta</a></div>
+        <div class="contact-row">⚡ <a href="https://aiwithsavan.xyz" target="_blank">aiwithsavan.xyz</a></div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="resume-body">
+
+      <!-- Main column -->
+      <div class="col-main">
+
+        <!-- Work Experience -->
+        <div class="section">
+          <h2 class="section-head">Work Experience</h2>
+
+          <div class="job">
+            <div class="job-title">Architect</div>
+            <div class="job-company">Persistent Systems · Thermo Fisher Scientific (Healthcare E-commerce &amp; AI)</div>
+            <div class="job-meta">
+              <span>Oct 2021 — Present</span>
+              <span>Bangalore, India</span>
+            </div>
+            <ul class="job-bullets">
+              <li>Designed platform services for AI agents, including orchestration via LangGraph, lifecycle management, and observability via LangSmith for high-fidelity recommendations.</li>
+              <li>Architected the core e-commerce engine for life sciences, leading the transition to high-availability microservices using Java, Spring Boot, and Node.js.</li>
+              <li>Engineered autonomous multi-agent systems to automate backend order processing and product discovery workflows, reducing manual procurement intervention by 30%.</li>
+              <li>Developed a production-grade RAG-based AI assistant handling complex HR, Finance, and Customer Support queries with 85%+ accurate real-time responses.</li>
+              <li>Led frontend modernization, migrating legacy components to React with Hooks and Functional Components, improving performance and state consistency.</li>
+              <li>Integrated GenAI to analyze and validate synchronization of massive e-commerce transaction data, reducing sync errors by 20% across legacy and modern applications.</li>
+              <li>Collaborated daily with US counterparts to align on architecture, share roadmaps, and ensure global consistency in AI platform features and security guardrails.</li>
+            </ul>
+          </div>
+
+          <div class="job">
+            <div class="job-title">Senior Software Engineer</div>
+            <div class="job-company">Mialo Technologies · Enterprise Full-Stack Modernization</div>
+            <div class="job-meta">
+              <span>Jun 2014 — Oct 2021</span>
+              <span>India</span>
+            </div>
+            <ul class="job-bullets">
+              <li>Architected and delivered scalable enterprise solutions including a multi-tenant CMS (Digimaker) and a large-scale ERP for India's second-largest cloth manufacturer (Banswara).</li>
+              <li>Designed enterprise-level dashboards and data-intensive interfaces using Angular (2–9) with RxJS for reactive programming and complex data streams.</li>
+              <li>Built performant, responsive UIs for global clients using React.js and Redux, ensuring cross-browser compatibility and high-fidelity user experiences.</li>
+              <li>Built and optimized backend services using Node.js, Java, and Spring Boot for high-throughput API performance and efficient data management.</li>
+              <li>Managed end-to-end deployment pipelines using Jenkins, Docker, and Kubernetes on AWS, ensuring stable and high-frequency release cycles.</li>
+              <li>Mentored engineering teams, raising the bar on technical craftsmanship, platform design, and UI/UX best practices.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Side column -->
+      <div class="col-side">
+
+        <div class="side-section">
+          <h2 class="section-head">AI &amp; Machine Learning</h2>
+          <div class="skill-tags">
+            <span class="skill-tag">LangGraph</span>
+            <span class="skill-tag">LangChain</span>
+            <span class="skill-tag">LangSmith</span>
+            <span class="skill-tag">OpenAI / Claude</span>
+            <span class="skill-tag">RAG Architecture</span>
+            <span class="skill-tag">Milvus / Pinecone</span>
+            <span class="skill-tag">Prompt Engineering</span>
+            <span class="skill-tag">Guardrails</span>
+            <span class="skill-tag">Agentic AI</span>
+          </div>
+        </div>
+
+        <div class="side-section">
+          <h2 class="section-head">Frontend</h2>
+          <div class="skill-tags">
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">Next.js</span>
+            <span class="skill-tag">Angular 2–9</span>
+            <span class="skill-tag">TypeScript</span>
+            <span class="skill-tag">Redux</span>
+            <span class="skill-tag">RxJS</span>
+            <span class="skill-tag">HTML5 / CSS3</span>
+          </div>
+        </div>
+
+        <div class="side-section">
+          <h2 class="section-head">Backend</h2>
+          <div class="skill-tags">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">FastAPI / Flask</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">Java</span>
+            <span class="skill-tag">Spring Boot</span>
+            <span class="skill-tag">GraphQL</span>
+            <span class="skill-tag">PostgreSQL</span>
+            <span class="skill-tag">Redis</span>
+          </div>
+        </div>
+
+        <div class="side-section">
+          <h2 class="section-head">Cloud &amp; DevOps</h2>
+          <div class="skill-tags">
+            <span class="skill-tag">AWS (EKS, Lambda, S3)</span>
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">Kubernetes</span>
+            <span class="skill-tag">Jenkins</span>
+            <span class="skill-tag">GitHub Actions</span>
+            <span class="skill-tag">MLOps</span>
+          </div>
+        </div>
+
+        <div class="side-section">
+          <h2 class="section-head">Education</h2>
+          <div class="edu-degree">B.Sc. — Computer Science</div>
+          <div class="edu-school">GTU University</div>
+          <div class="edu-year" style="margin-bottom:10px"></div>
+          <div class="edu-degree">Diploma — Computer Science</div>
+          <div class="edu-school">GTU University</div>
+        </div>
+
+        <div class="side-section">
+          <h2 class="section-head">Certifications</h2>
+          <ul class="side-list">
+            <li>React — The Complete Guide (Udemy)</li>
+            <li>AI Architect &amp; GenAI Masterclass</li>
+            <li>Technical Training Certification (GTU)</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

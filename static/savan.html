@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Savan Mehta — Staff AI Engineer & AI Architect</title>
+  <meta name="description" content="Staff AI Engineer and Architect with 11+ years building autonomous multi-agent systems, RAG architectures, and enterprise AI platforms." />
+  <meta property="og:title" content="Savan Mehta — Staff AI Engineer & AI Architect" />
+  <meta property="og:description" content="Building autonomous AI agents and enterprise-grade AI platforms." />
+  <meta property="og:url" content="https://aiwithsavan.xyz/savan" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2128;
+      --border: rgba(255,255,255,0.08);
+      --green: #10b981;
+      --green-dim: rgba(16,185,129,0.12);
+      --text: #f0f6fc;
+      --text2: #8b949e;
+      --text3: #6e7681;
+      --radius: 12px;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+      overflow-x: hidden;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-size: 18px; font-weight: 700; color: var(--text);
+      text-decoration: none; letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--text2); text-decoration: none; font-size: 13.5px;
+      font-weight: 500; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--green); color: #000; padding: 7px 16px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+    .nav-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 100px 5% 80px;
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green-dim); color: var(--green);
+      padding: 5px 14px; border-radius: 20px; font-size: 12.5px;
+      font-weight: 600; letter-spacing: 0.5px; margin-bottom: 24px;
+    }
+    .hero-eyebrow::before { content: '●'; font-size: 8px; }
+    .hero h1 {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800; line-height: 1.15;
+      letter-spacing: -1.5px; margin-bottom: 22px;
+    }
+    .hero h1 em { color: var(--green); font-style: normal; }
+    .hero-sub {
+      color: var(--text2); font-size: 16px; max-width: 520px;
+      margin-bottom: 36px; line-height: 1.75;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green); color: #000; padding: 12px 24px;
+      border-radius: 8px; font-weight: 600; font-size: 14px;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); padding: 12px 24px;
+      border-radius: 8px; font-weight: 500; font-size: 14px;
+      text-decoration: none; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--green); color: var(--green); }
+    .hero-socials { display: flex; gap: 14px; margin-top: 32px; }
+    .hero-socials a {
+      color: var(--text3); text-decoration: none; font-size: 13px;
+      display: flex; align-items: center; gap: 5px;
+      transition: color 0.2s;
+    }
+    .hero-socials a:hover { color: var(--green); }
+    .hero-avatar {
+      width: 340px; height: 420px;
+      border-radius: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+    .hero-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 15%;
+    }
+    .hero-avatar::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: 20px;
+      box-shadow: inset 0 0 0 1px rgba(16,185,129,0.2);
+    }
+
+    /* ── Stats ── */
+    .stats {
+      background: var(--bg2); border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 36px 5%;
+    }
+    .stats-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 24px;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 800; color: var(--green); letter-spacing: -1px; }
+    .stat-label { color: var(--text2); font-size: 13px; margin-top: 4px; }
+
+    /* ── Sections ── */
+    section { padding: 80px 5%; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      color: var(--green); font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: clamp(24px, 3vw, 36px); font-weight: 800;
+      letter-spacing: -0.5px; margin-bottom: 14px;
+    }
+    .section-sub { color: var(--text2); max-width: 560px; margin-bottom: 50px; line-height: 1.75; }
+
+    /* ── About ── */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+    }
+    .about-text p { color: var(--text2); margin-bottom: 16px; line-height: 1.8; }
+    .about-highlights { display: flex; flex-direction: column; gap: 14px; }
+    .highlight-item {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .highlight-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .highlight-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .highlight-desc { color: var(--text2); font-size: 13px; }
+
+    /* ── Skills ── */
+    .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .skill-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .skill-card:hover { border-color: var(--green); }
+    .skill-card-icon { font-size: 26px; margin-bottom: 14px; }
+    .skill-card-title { font-weight: 700; font-size: 15px; margin-bottom: 10px; color: var(--text); }
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .skill-tag {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text2); padding: 4px 10px; border-radius: 5px;
+      font-size: 12px; font-weight: 500;
+    }
+    .skill-tag.green { background: var(--green-dim); border-color: rgba(16,185,129,0.3); color: var(--green); }
+
+    /* ── Experience ── */
+    .experience-list { display: flex; flex-direction: column; gap: 0; }
+    .exp-item {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 0 32px; position: relative;
+    }
+    .exp-item:not(:last-child)::after {
+      content: ''; position: absolute; left: 19px; top: 40px;
+      width: 2px; height: calc(100% - 10px);
+      background: var(--border);
+    }
+    .exp-dot-col { display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
+    .exp-dot {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--green-dim); border: 2px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0; z-index: 1;
+    }
+    .exp-content { padding: 0 0 48px 0; }
+    .exp-period {
+      color: var(--green); font-size: 12px; font-weight: 600;
+      letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .exp-role { font-size: 18px; font-weight: 700; margin-bottom: 3px; }
+    .exp-company { color: var(--text2); font-size: 14px; margin-bottom: 10px; font-weight: 500; }
+    .exp-project {
+      background: var(--green-dim); color: var(--green);
+      display: inline-block; padding: 3px 10px; border-radius: 4px;
+      font-size: 12px; font-weight: 600; margin-bottom: 14px;
+    }
+    .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .exp-bullets li {
+      color: var(--text2); font-size: 14px; line-height: 1.65;
+      padding-left: 16px; position: relative;
+    }
+    .exp-bullets li::before {
+      content: '▸'; position: absolute; left: 0; color: var(--green); font-size: 11px; top: 3px;
+    }
+    .exp-impact {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px;
+    }
+    .impact-badge {
+      background: var(--bg3); border: 1px solid var(--border);
+      padding: 5px 12px; border-radius: 6px;
+      font-size: 12px; font-weight: 600; color: var(--text);
+    }
+    .impact-badge strong { color: var(--green); }
+
+    /* ── Projects ── */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    .project-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .project-card:hover { border-color: var(--green); transform: translateY(-2px); }
+    .project-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .project-icon { font-size: 28px; }
+    .project-link {
+      color: var(--text3); text-decoration: none; font-size: 18px;
+      transition: color 0.2s;
+    }
+    .project-link:hover { color: var(--green); }
+    .project-title { font-size: 16px; font-weight: 700; }
+    .project-desc { color: var(--text2); font-size: 13.5px; line-height: 1.65; flex: 1; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .project-tag {
+      background: var(--bg3); color: var(--text3);
+      padding: 3px 9px; border-radius: 4px; font-size: 11.5px;
+    }
+
+    /* ── Blog ── */
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 20px; }
+    .blog-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 24px;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.2s;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .blog-card:hover { border-color: var(--green); }
+    .blog-tag { color: var(--green); font-size: 11.5px; font-weight: 600; letter-spacing: 0.5px; }
+    .blog-title { font-size: 15px; font-weight: 600; line-height: 1.5; }
+    .blog-desc { color: var(--text2); font-size: 13px; line-height: 1.6; }
+    .blog-cta-link { color: var(--green); font-size: 13px; font-weight: 600; margin-top: auto; }
+
+    /* ── Leadership ── */
+    .leadership-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+    .leadership-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px;
+    }
+    .leadership-num { font-size: 36px; font-weight: 800; color: var(--green); opacity: 0.3; margin-bottom: 12px; }
+    .leadership-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .leadership-desc { color: var(--text2); font-size: 13.5px; line-height: 1.65; }
+
+    /* ── Contact ── */
+    .contact-section { background: var(--bg2); border-top: 1px solid var(--border); }
+    .contact-inner {
+      max-width: 700px; margin: 0 auto; text-align: center;
+      padding: 80px 5%;
+    }
+    .contact-inner .section-title { font-size: 36px; }
+    .contact-inner .section-sub { margin: 16px auto 40px; }
+    .contact-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .contact-link {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); text-decoration: none;
+      padding: 12px 22px; border-radius: 8px; font-size: 14px;
+      font-weight: 500; transition: border-color 0.2s, color 0.2s;
+    }
+    .contact-link:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1100px; margin: 0 auto;
+    }
+    footer p { color: var(--text3); font-size: 13px; }
+    footer a { color: var(--green); text-decoration: none; }
+
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 60px 5%; }
+      .hero-avatar { width: 200px; height: 250px; order: -1; border-radius: 16px; margin: 0 auto; }
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      .about-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .leadership-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .nav-menu-btn { display: block; }
+    }
+    @media (max-width: 600px) {
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      section { padding: 60px 5%; }
+      footer { flex-direction: column; gap: 10px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/savan" class="nav-logo">S<span>M</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Expertise</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <a href="https://www.linkedin.com/in/savankumar-mehta-9626613b" target="_blank" class="nav-cta" style="background:transparent;color:var(--text);border:1px solid var(--border);">Connect</a>
+      <a href="/savan/resume" class="nav-cta">Resume ↗</a>
+    </div>
+    <button class="nav-menu-btn" onclick="document.querySelector('.nav-links').style.display = document.querySelector('.nav-links').style.display === 'flex' ? 'none' : 'flex'; document.querySelector('.nav-links').style.flexDirection='column'; document.querySelector('.nav-links').style.position='absolute'; document.querySelector('.nav-links').style.top='60px'; document.querySelector('.nav-links').style.left='0'; document.querySelector('.nav-links').style.right='0'; document.querySelector('.nav-links').style.background='#161b22'; document.querySelector('.nav-links').style.padding='20px'; document.querySelector('.nav-links').style.borderBottom='1px solid rgba(255,255,255,0.08)';">☰</button>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Available for senior AI roles · Bangalore, India</div>
+      <h1>Building <em>autonomous AI agents</em> &amp; enterprise platforms</h1>
+      <p class="hero-sub">Staff AI Engineer &amp; Architect with 11+ years designing secure, enterprise-grade Agentic AI platforms — autonomous multi-agent systems with LangGraph, production RAG pipelines, and large-scale full-stack modernization across global teams (India/US).</p>
+      <div class="hero-actions">
+        <a href="#experience" class="btn-primary">View My Work</a>
+        <a href="https://www.linkedin.com/in/savankumar-mehta-9626613b" target="_blank" class="btn-outline">Download Resume ↗</a>
+      </div>
+      <div class="hero-socials">
+        <a href="https://www.linkedin.com/in/savankumar-mehta-9626613b" target="_blank">🔗 LinkedIn</a>
+        <a href="https://medium.com/@savan.mehta90" target="_blank">✍️ Medium Blog</a>
+        <a href="mailto:savan.mehta90@gmail.com">✉️ Email</a>
+        <a href="/">⚡ AI News</a>
+      </div>
+    </div>
+    <div class="hero-avatar"><img src="/static/savan-photo.jpg" alt="Savan Mehta" /></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stats-inner">
+      <div class="stat">
+        <div class="stat-num">11+</div>
+        <div class="stat-label">Years Engineering</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Companies · Global Teams</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">85%+</div>
+        <div class="stat-label">RAG Accuracy Achieved</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">30%</div>
+        <div class="stat-label">Procurement Effort Reduced</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-inner">
+      <div class="section-tag">About</div>
+      <h2 class="section-title">The engineer behind the systems</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>I'm a Staff AI Engineer and Architect based in Bangalore, India, specializing in designing and scaling enterprise-grade Agentic AI platforms. My work sits at the intersection of AI orchestration, backend engineering, and frontend excellence.</p>
+          <p>At Persistent Systems, I lead AI platform development for Thermo Fisher Scientific — one of the world's largest life sciences companies — building multi-agent systems, production RAG pipelines, and modernizing their E-commerce core.</p>
+          <p>I collaborate daily with US counterparts to align on architecture, security guardrails, and AI roadmaps, bringing together global engineering teams to ship impactful, reliable systems at scale.</p>
+          <p style="color: var(--text2);">Outside of work, I write about AI architecture, RAG systems, and engineering leadership on Medium — and I built <a href="/" style="color: var(--green);">AI News Briefing</a>, a personalized daily AI news dashboard.</p>
+        </div>
+        <div class="about-highlights">
+          <div class="highlight-item">
+            <div class="highlight-icon">🧠</div>
+            <div>
+              <div class="highlight-title">AI-First Architecture</div>
+              <div class="highlight-desc">Designing autonomous agent systems and RAG pipelines that work in production at enterprise scale, not just in demos.</div>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">⚡</div>
+            <div>
+              <div class="highlight-title">Full-Stack Depth</div>
+              <div class="highlight-desc">11+ years across React, Angular, Node.js, Java, Python — from pixel-perfect UIs to high-throughput backend APIs.</div>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">🌍</div>
+            <div>
+              <div class="highlight-title">Global Collaboration</div>
+              <div class="highlight-desc">Daily cross-timezone alignment with US engineering teams, mentoring engineers in India to raise the technical bar.</div>
+            </div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-icon">🔒</div>
+            <div>
+              <div class="highlight-title">Enterprise Security Focus</div>
+              <div class="highlight-desc">Building AI guardrails, secure data pipelines, and compliance-aware architectures for healthcare and life sciences.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="section-inner">
+      <div class="section-tag">Expertise</div>
+      <h2 class="section-title">Technical Arsenal</h2>
+      <p class="section-sub">A deep stack built over 11 years — from autonomous AI agents to distributed backend systems and modern frontend frameworks.</p>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <div class="skill-card-icon">🤖</div>
+          <div class="skill-card-title">AI &amp; Machine Learning</div>
+          <p style="color:var(--text2);font-size:13.5px;">Expert in agentic AI orchestration, RAG architecture, and production LLM integrations with observability and guardrails.</p>
+          <div class="skill-tags">
+            <span class="skill-tag green">LangGraph</span>
+            <span class="skill-tag green">RAG Architecture</span>
+            <span class="skill-tag">LangChain</span>
+            <span class="skill-tag">LangSmith</span>
+            <span class="skill-tag">OpenAI / Claude</span>
+            <span class="skill-tag">Milvus</span>
+            <span class="skill-tag">Pinecone</span>
+            <span class="skill-tag">ChromaDB</span>
+            <span class="skill-tag">Prompt Engineering</span>
+            <span class="skill-tag">Guardrails</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-card-icon">⚛️</div>
+          <div class="skill-card-title">Frontend Engineering</div>
+          <p style="color:var(--text2);font-size:13.5px;">Led large-scale UI modernizations with React and Angular, building enterprise dashboards and high-performance user interfaces.</p>
+          <div class="skill-tags">
+            <span class="skill-tag green">React.js</span>
+            <span class="skill-tag green">TypeScript</span>
+            <span class="skill-tag">Next.js</span>
+            <span class="skill-tag">Angular 2–9</span>
+            <span class="skill-tag">Redux</span>
+            <span class="skill-tag">RxJS</span>
+            <span class="skill-tag">ES6+</span>
+            <span class="skill-tag">SASS/CSS3</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-card-icon">🔧</div>
+          <div class="skill-card-title">Backend &amp; Orchestration</div>
+          <p style="color:var(--text2);font-size:13.5px;">Building high-throughput microservices, event-driven systems, and distributed APIs across Node.js, Java, and Python.</p>
+          <div class="skill-tags">
+            <span class="skill-tag green">Python (FastAPI)</span>
+            <span class="skill-tag green">Node.js</span>
+            <span class="skill-tag">Java / Spring Boot</span>
+            <span class="skill-tag">GraphQL</span>
+            <span class="skill-tag">Microservices</span>
+            <span class="skill-tag">REST APIs</span>
+            <span class="skill-tag">PostgreSQL</span>
+            <span class="skill-tag">Redis</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="skill-card-icon">☁️</div>
+          <div class="skill-card-title">Cloud &amp; Infrastructure</div>
+          <p style="color:var(--text2);font-size:13.5px;">End-to-end cloud delivery on AWS with container orchestration, CI/CD pipelines, and MLOps infrastructure.</p>
+          <div class="skill-tags">
+            <span class="skill-tag green">AWS (EKS/ECS/Lambda)</span>
+            <span class="skill-tag green">Kubernetes</span>
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">SageMaker</span>
+            <span class="skill-tag">OpenSearch</span>
+            <span class="skill-tag">Jenkins</span>
+            <span class="skill-tag">GitHub Actions</span>
+            <span class="skill-tag">MLOps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="section-inner">
+      <div class="section-tag">Experience</div>
+      <h2 class="section-title">Career Timeline</h2>
+      <p class="section-sub">11+ years building at the intersection of AI, enterprise software, and frontend engineering.</p>
+      <div class="experience-list">
+
+        <div class="exp-item">
+          <div class="exp-dot-col">
+            <div class="exp-dot">🏗️</div>
+          </div>
+          <div class="exp-content">
+            <div class="exp-period">OCT 2021 – PRESENT · 3+ YEARS</div>
+            <div class="exp-role">Architect</div>
+            <div class="exp-company">Persistent Systems · Client: Thermo Fisher Scientific</div>
+            <div class="exp-project">Healthcare E-commerce &amp; AI Transformation</div>
+            <ul class="exp-bullets">
+              <li>Designed and developed platform services for AI agents — orchestration via LangGraph, lifecycle management, and observability via LangSmith for high-fidelity recommendations.</li>
+              <li>Architected the core E-commerce engine for life sciences, leading transition to high-availability microservices using Java, Spring Boot, and Node.js.</li>
+              <li>Engineered autonomous multi-agent systems to automate complex backend order processing and product discovery workflows.</li>
+              <li>Developed a production-grade RAG-based AI assistant for HR, Finance, and Customer Support queries, indexing corporate policy data for real-time responses.</li>
+              <li>Led frontend modernization from legacy components to modern React architecture with Hooks and Functional Components.</li>
+              <li>Daily collaboration with US counterparts on architecture alignment, AI roadmaps, and global security guardrails.</li>
+              <li>Integrated GenAI to validate synchronization of massive E-commerce transaction data across legacy and modern systems.</li>
+            </ul>
+            <div class="exp-impact">
+              <div class="impact-badge"><strong>30%</strong> procurement effort reduced</div>
+              <div class="impact-badge"><strong>85%+</strong> RAG accuracy</div>
+              <div class="impact-badge"><strong>20%</strong> fewer sync errors</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="exp-item">
+          <div class="exp-dot-col">
+            <div class="exp-dot">💻</div>
+          </div>
+          <div class="exp-content">
+            <div class="exp-period">JUNE 2014 – OCT 2021 · 7+ YEARS</div>
+            <div class="exp-role">Senior Software Engineer</div>
+            <div class="exp-company">Mialo Technologies</div>
+            <div class="exp-project">Enterprise Full-Stack · Digimaker CMS &amp; Banswara ERP</div>
+            <ul class="exp-bullets">
+              <li>Architected a multi-tenant CMS and large-scale ERP system for India's second-largest cloth manufacturing company.</li>
+              <li>Designed enterprise-level dashboards and data-intensive interfaces using Angular 2–9 with RxJS for reactive data streams.</li>
+              <li>Built responsive, performant UIs for global clients using React.js and Redux with cross-browser compatibility.</li>
+              <li>Engineered robust backend services in Node.js, Java, and Spring Boot ensuring high-throughput API performance.</li>
+              <li>Managed end-to-end deployment pipelines with Jenkins, Docker, and Kubernetes on AWS.</li>
+              <li>Mentored engineering teams in India, raising the bar on technical craftsmanship and UI/UX best practices.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-inner">
+      <div class="section-tag">Projects</div>
+      <h2 class="section-title">Selected Work</h2>
+      <p class="section-sub">Systems I've designed and shipped — from enterprise AI platforms to personal tools.</p>
+      <div class="projects-grid">
+
+        <div class="project-card">
+          <div class="project-card-top">
+            <div class="project-icon">🧠</div>
+          </div>
+          <div class="project-title">Production RAG AI Assistant</div>
+          <div class="project-desc">Built an enterprise-grade RAG pipeline for Thermo Fisher Scientific handling HR, Finance, and Customer Support queries. Indexed corporate policy documents with 85%+ response accuracy using vector search and LangGraph orchestration.</div>
+          <div class="project-tags">
+            <span class="project-tag">LangGraph</span>
+            <span class="project-tag">RAG</span>
+            <span class="project-tag">Python</span>
+            <span class="project-tag">Vector DB</span>
+            <span class="project-tag">LangSmith</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-card-top">
+            <div class="project-icon">🤖</div>
+          </div>
+          <div class="project-title">Multi-Agent Order Processing</div>
+          <div class="project-desc">Engineered autonomous multi-agent systems to automate complex backend order processing and product discovery workflows for life sciences e-commerce — reducing manual procurement intervention by 30%.</div>
+          <div class="project-tags">
+            <span class="project-tag">Agentic AI</span>
+            <span class="project-tag">LangChain</span>
+            <span class="project-tag">Java</span>
+            <span class="project-tag">Spring Boot</span>
+            <span class="project-tag">AWS</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-card-top">
+            <div class="project-icon">⚡</div>
+            <a href="/" class="project-link" title="Visit AI News Briefing">↗</a>
+          </div>
+          <div class="project-title">AI News Briefing</div>
+          <div class="project-desc">Personal project — a daily AI news dashboard aggregating 500+ stories from top AI research labs, tech blogs, and my own Medium articles. Built with FastAPI, vanilla JS, and Supabase. Live at aiwithsavan.xyz.</div>
+          <div class="project-tags">
+            <span class="project-tag">FastAPI</span>
+            <span class="project-tag">Python</span>
+            <span class="project-tag">Supabase</span>
+            <span class="project-tag">JavaScript</span>
+            <span class="project-tag">Oracle Cloud</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-card-top">
+            <div class="project-icon">🏭</div>
+          </div>
+          <div class="project-title">Banswara ERP System</div>
+          <div class="project-desc">Large-scale ERP for India's second-largest cloth manufacturing company — enterprise dashboards, manufacturing modules, complex data streams with Angular and RxJS, deployed on AWS with Kubernetes.</div>
+          <div class="project-tags">
+            <span class="project-tag">Angular</span>
+            <span class="project-tag">RxJS</span>
+            <span class="project-tag">Node.js</span>
+            <span class="project-tag">SQL Server</span>
+            <span class="project-tag">Kubernetes</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- BLOG -->
+  <section id="blog">
+    <div class="section-inner">
+      <div class="section-tag">Blog</div>
+      <h2 class="section-title">Writing on AI &amp; Engineering</h2>
+      <p class="section-sub">I write about RAG architecture, multi-agent systems, and real-world AI engineering on Medium.</p>
+      <div class="blog-grid">
+        <a class="blog-card" href="https://medium.com/@savan.mehta90" target="_blank">
+          <div class="blog-tag">RAG ARCHITECTURE</div>
+          <div class="blog-title">Building a Production-Grade RAG Platform — Gateway &amp; Orchestration Layer</div>
+          <div class="blog-desc">A deep dive into the architecture decisions behind a production RAG system — from gateway design to orchestration patterns that actually scale.</div>
+          <div class="blog-cta-link">Read on Medium →</div>
+        </a>
+        <a class="blog-card" href="https://medium.com/@savan.mehta90" target="_blank">
+          <div class="blog-tag">MULTI-AGENT SYSTEMS</div>
+          <div class="blog-title">Why Most Enterprise RAG Systems Fail in Production</div>
+          <div class="blog-desc">What a production-grade RAG architecture actually looks like — and the common mistakes that cause enterprise systems to fail when real users hit them.</div>
+          <div class="blog-cta-link">Read on Medium →</div>
+        </a>
+        <a class="blog-card" href="https://medium.com/@savan.mehta90" target="_blank">
+          <div class="blog-tag">AI ENGINEERING</div>
+          <div class="blog-title">More articles on AI architecture, LangGraph &amp; enterprise engineering</div>
+          <div class="blog-desc">Follow my Medium blog for deep-dives on agentic AI, RAG pipelines, LangGraph patterns, and lessons from building AI systems at enterprise scale.</div>
+          <div class="blog-cta-link">Follow on Medium →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- LEADERSHIP -->
+  <section>
+    <div class="section-inner">
+      <div class="section-tag">Philosophy</div>
+      <h2 class="section-title">How I work</h2>
+      <p class="section-sub">Engineering principles that guide how I design systems and lead teams.</p>
+      <div class="leadership-grid">
+        <div class="leadership-card">
+          <div class="leadership-num">01</div>
+          <div class="leadership-title">Production over Proof-of-Concept</div>
+          <div class="leadership-desc">AI systems must work in the real world — with real data, real edge cases, and real users. I design for production from day one: observability, guardrails, fallbacks, and measurable accuracy targets.</div>
+        </div>
+        <div class="leadership-card">
+          <div class="leadership-num">02</div>
+          <div class="leadership-title">Security &amp; Guardrails First</div>
+          <div class="leadership-desc">In healthcare and enterprise environments, security isn't optional. Every AI system I build includes guardrails, data governance, and compliance-aware design — not as an afterthought.</div>
+        </div>
+        <div class="leadership-card">
+          <div class="leadership-num">03</div>
+          <div class="leadership-title">Cross-Timezone Leadership</div>
+          <div class="leadership-desc">Having worked daily with US teams for 3+ years, I know that distributed engineering works best with clear documentation, async-first communication, and shared architectural context.</div>
+        </div>
+        <div class="leadership-card">
+          <div class="leadership-num">04</div>
+          <div class="leadership-title">Mentorship &amp; Technical Growth</div>
+          <div class="leadership-desc">The best technical leverage is in raising the people around you. I invest in mentoring engineers to think in systems, write maintainable code, and own their craft end-to-end.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <div class="contact-section" id="contact">
+    <div class="contact-inner">
+      <div class="section-tag" style="text-align:center;margin-bottom:8px;">Contact</div>
+      <h2 class="section-title">Let's build something great</h2>
+      <p class="section-sub">Open to senior AI engineering and architecture roles, consulting engagements, or just a conversation about AI systems.</p>
+      <div class="contact-links">
+        <a href="mailto:savan.mehta90@gmail.com" class="contact-link">✉️ savan.mehta90@gmail.com</a>
+        <a href="https://www.linkedin.com/in/savankumar-mehta-9626613b" target="_blank" class="contact-link">🔗 LinkedIn</a>
+        <a href="https://medium.com/@savan.mehta90" target="_blank" class="contact-link">✍️ Medium</a>
+        <a href="/" class="contact-link">⚡ AI News</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Savan Mehta · Bangalore, India</p>
+    <p>Built with FastAPI · <a href="/">AI News Briefing ↗</a></p>
+  </footer>
+
+</body>
+</html>
